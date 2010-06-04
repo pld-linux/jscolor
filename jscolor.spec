@@ -7,7 +7,7 @@ Group:		Applications/WWW
 Source0:	http://jscolor.com/release/%{name}-%{version}.zip
 # Source0-md5:	d930b60c74f1e9292188168dab3f478b
 URL:		http://www.jscolor.com/
-BuildRequires:	rpmbuild(macros) > 1.268
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	unzip
 Requires:	webserver(access)
 Requires:	webserver(alias)
