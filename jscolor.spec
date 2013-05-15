@@ -1,7 +1,7 @@
 Summary:	JavaScript Color Picker (Chooser)
 Name:		jscolor
 Version:	1.3.1
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Applications/WWW
 Source0:	http://jscolor.com/release/%{name}-%{version}.zip
@@ -11,6 +11,7 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	unzip
 Requires:	webserver(access)
 Requires:	webserver(alias)
+Conflicts:	apache-base < 2.4.0-1
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -28,11 +29,19 @@ dialog.
 %setup -qc
 mv jscolor/demo.html .
 
-# apache1/apache2 conf
+# apache1 conf
 cat > apache.conf <<'EOF'
 Alias /js/%{name} %{_appdir}
 <Directory %{_appdir}>
 	Allow from all
+</Directory>
+EOF
+
+# apache2 conf
+cat > httpd.conf <<'EOF'
+Alias /js/%{name} %{_appdir}
+<Directory %{_appdir}>
+	Require all granted
 </Directory>
 EOF
 
@@ -49,7 +58,7 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_appdir}}
 cp -a jscolor/* $RPM_BUILD_ROOT%{_appdir}
 
 cp -a apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
-cp -a apache.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
+cp -a httpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf
 cp -a lighttpd.conf $RPM_BUILD_ROOT%{_sysconfdir}/lighttpd.conf
 
 %clean
@@ -61,10 +70,10 @@ rm -rf $RPM_BUILD_ROOT
 %triggerun -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
-%triggerin -- apache < 2.2.0, apache-base
+%triggerin -- apache-base
 %webapp_register httpd %{_webapp}
 
-%triggerun -- apache < 2.2.0, apache-base
+%triggerun -- apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerin -- lighttpd
